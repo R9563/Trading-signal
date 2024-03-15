@@ -1,0 +1,46 @@
+import numpy as np
+import pandas as pd
+import talib
+
+def custom_indicator(close_prices, window=14, trend_window=50, volatility_window=30, volatility_threshold=0.05):
+    """
+    Calculate a custom trading indicator based on adaptive moving average, AI-enhanced RSI,
+    trend confirmation signal, and volatility filter.
+
+    Parameters:
+    close_prices (array-like): Close prices of the asset.
+    window (int): Window for adaptive moving average (default: 14).
+    trend_window (int): Window for trend confirmation signal (default: 50).
+    volatility_window (int): Window for volatility filter (default: 30).
+    volatility_threshold (float): Threshold for volatility filter (default: 0.05).
+
+    Returns:
+    combined_signal (array-like): Combined trading signal based on the strategy.
+    """
+    # Calculate adaptive moving average
+    ama = talib.SMA(close_prices, timeperiod=window)
+
+    # Calculate AI-enhanced RSI
+    ai_rsi = talib.RSI(close_prices)
+
+    # Calculate trend confirmation signal
+    sma = talib.SMA(close_prices, timeperiod=trend_window)
+    trend_signal = np.where(close_prices > sma, 1, 0)
+
+    # Calculate volatility filter
+    volatility = np.std(close_prices)
+    volatility_signal = np.where(volatility > volatility_threshold, 0, 1)
+
+    # Combine signals based on your trading strategy
+    combined_signal = np.where((trend_signal == 1) & (volatility_signal == 1), 1, 0)
+
+    return combined_signal
+
+# Example usage
+# Load historical price data
+# df = pd.read_csv('historical_data.csv')
+# close_prices = df['Close']
+
+# Calculate custom indicator
+# custom_signal = custom_indicator(close_prices)
+# print("Custom Signal:", custom_signal)
